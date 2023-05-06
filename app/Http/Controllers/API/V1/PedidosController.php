@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StorePedidoRequest;
+use App\Models\API\V1\DetallePedido;
 use App\Models\API\V1\Pedidos;
 use Illuminate\Http\Request;
 
@@ -27,7 +28,7 @@ class PedidosController extends Controller
         $currentDate = date('Y-m-d');
         $currentTime = date('H:i:s');
 
-        $order = Pedidos::create([
+        $orderData = [
             'F_EMISION' => $attributes['F_EMISION'] ?? $currentDateTime,
             'CLIENTE' => $attributes['cliente'],
             'VEND' => $attributes['vend'],
@@ -37,9 +38,9 @@ class PedidosController extends Controller
             'PRECIO' => $attributes['precio'],
             'COSTO' => $attributes['costo'],
             'ALMACEN' => $attributes['almacen'],
-//            'ESTADO' => $attributes['estado'] ?? 'PE',
+            'ESTADO' => $attributes['estado'] ?? 'PE',
             'OBSERV' => 'Pedido App' . $attributes['observ'],
-            'TIPO_CAM' => $attributes['tipo_cam'] ?? 'MXN',
+            'TIPO_CAM' => $attributes['tipo_cam'] ?? 2,
             'MONEDA' => $attributes['moneda'],
             'DATOS' => $attributes['datos'],
             'DESGLOSE' => $attributes['desglose'],
@@ -53,7 +54,30 @@ class PedidosController extends Controller
             'NO_PED' => $attributes['no_ped'],
             'COTIZAREMOTA' => $attributes['cotizaremota'],
             'OCUPADO' => $attributes['ocupado'],
-        ]);
+        ];
+
+        $order = Pedidos::create($orderData);
+
+        foreach ($request->input('products') as $product) {
+            $orderDetail = new DetallePedido([
+                'pedido' => $order->PEDIDO,
+                'ARTICULO' => $product['articulo'],
+                'CANTIDAD' => $product['cantidad'],
+                'POR_SURT' => $product['por_surt'] ?? 1,
+                'PRECIO' => $product['precio'],
+                'DESCUENTO' => $product['descuento'] ?? '',
+                'IMPUESTO' => $product['impuesto'] ?? 0,
+                'OBSERV' => $product['observ'] ?? "",
+                'Usuario' => $product['usuario'] ?? "",
+                'UsuFecha' => $product['usufecha'] ?? $currentDateTime,
+                'UsuHora' => $product['usuhora'] ?? $currentTime,
+                'Almacen' => $product['almacen'] ?? 1,
+                'Lista' => $product['lista'] ?? 0,
+            ]);
+
+            $order->orderDetails()->save($orderDetail);
+        }
+
         return response()->json(['data' => $order]);
     }
 

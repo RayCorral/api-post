@@ -24,20 +24,25 @@ class Pedidos extends Model
         'COSTO',
         'ALMACEN',
         'ESTADO',
-////        'OBSERV',
-////        'TIPO_CAM',
-////        'MONEDA',
-////        'DATOS',
-////        'DESGLOSE',
-////        'USUARIO',
-////        'USUFECHA',
-////        'USUHORA',
-////        'PEDCLI',
-////        'APLICARDES',
-////        'ENTREGA',
-////        'TIPO',
-////        'NO_PED',
-////        'COTIZAREMOTA',
-////        'OCUPADO',
+        'OBSERV',
+        'TIPO_CAM',
+        'MONEDA',
+        'DATOS',
+        'DESGLOSE',
+        'USUARIO',
+        'USUFECHA',
+        'USUHORA',
+        'PEDCLI',
+        'APLICARDES',
+        'ENTREGA',
+        'TIPO',
+        'NO_PED',
+        'COTIZAREMOTA',
+        'OCUPADO',
     ];
+
+    public function orderDetails()
+    {
+        return $this->hasMany(DetallePedido::class,'pedido', 'pedido');
+    }
 }
