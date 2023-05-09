@@ -16,7 +16,6 @@ class ClientesController extends Controller
     {
         $clientes = Clients::paginate(30);
         return ClientesResource::collection($clientes);
-
     }
 
     /**
@@ -30,9 +29,10 @@ class ClientesController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Clients $client)
+    public function show(string $id)
     {
-        //
+        $cliente = Clients::findOrFail($id);
+        return new ClientesResource($cliente);
     }
 
     /**

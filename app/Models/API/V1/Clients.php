@@ -10,4 +10,6 @@ class Clients extends Model
     use HasFactory;
 
     public $table = "clients";
+    protected $primaryKey = 'CLIENTE';
+    public $timestamps = false;
 }

@@ -17,7 +17,7 @@ use App\Http\Controllers\API\V1\ClientesController;
 
 
 Route::get('/clientes', [ClientesController::class, 'index']);
-Route::get('/clientes/{id}', [ClientesController::class, 'index']);
+Route::get('/clientes/{id}', [ClientesController::class, 'show']);
 Route::post('/pedido', [\App\Http\Controllers\API\V1\PedidosController::class, 'store']);
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

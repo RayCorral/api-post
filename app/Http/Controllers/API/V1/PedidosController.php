@@ -27,6 +27,7 @@ class PedidosController extends Controller
         $currentDateTime = date('Y-m-d H:i:s');
         $currentDate = date('Y-m-d');
         $currentTime = date('H:i:s');
+        $usuario = $attributes['usuario'];
 
         $orderData = [
             'F_EMISION' => $attributes['F_EMISION'] ?? $currentDateTime,
@@ -44,7 +45,7 @@ class PedidosController extends Controller
             'MONEDA' => $attributes['moneda'],
             'DATOS' => $attributes['datos'],
             'DESGLOSE' => $attributes['desglose'],
-            'USUARIO' => $attributes['usuario'],
+            'USUARIO' => $usuario,
             'USUFECHA' => $attributes['usufecha'] ?? $currentDateTime,
             'USUHORA' => $attributes['usuhora'] ?? $currentTime,
             'PEDCLI' => $attributes['pedcli'],
@@ -57,7 +58,7 @@ class PedidosController extends Controller
         ];
 
         $order = Pedidos::create($orderData);
-
+        $importeTotal = 0;
         foreach ($request->input('products') as $product) {
             $orderDetail = new DetallePedido([
                 'pedido' => $order->PEDIDO,
@@ -68,7 +69,7 @@ class PedidosController extends Controller
                 'DESCUENTO' => $product['descuento'] ?? '',
                 'IMPUESTO' => $product['impuesto'] ?? 0,
                 'OBSERV' => $product['observ'] ?? "",
-                'Usuario' => $product['usuario'] ?? "",
+                'Usuario' => $usuario,
                 'UsuFecha' => $product['usufecha'] ?? $currentDateTime,
                 'UsuHora' => $product['usuhora'] ?? $currentTime,
                 'Almacen' => $product['almacen'] ?? 1,
@@ -76,7 +77,11 @@ class PedidosController extends Controller
             ]);
 
             $order->orderDetails()->save($orderDetail);
+
+            $importeTotal += $orderDetail->CANTIDAD * $orderDetail->PRECIO;
         }
+
+        $order->update(['IMPORTE' => $importeTotal]);
 
         return response()->json(['data' => $order]);
     }
